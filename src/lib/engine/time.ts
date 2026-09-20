@@ -1,0 +1,87 @@
+import type { GeneralSettings } from "./types";
+
+const DAY_MS = 86400000;
+type BillingClock = Pick<GeneralSettings, "billingHour" | "billingMinute">;
+
+export function getBillingPeriodStart(datetime: Date, gs: GeneralSettings): Date {
+  const start = new Date(
+    datetime.getFullYear(), datetime.getMonth(), gs.billingDay,
+    gs.billingHour, gs.billingMinute, 0, 0,
+  );
+  if (datetime < start) {
+    return new Date(
+      datetime.getFullYear(), datetime.getMonth() - 1, gs.billingDay,
+      gs.billingHour, gs.billingMinute, 0, 0,
+    );
+  }
+  return start;
+}
+
+export function addMonth(date: Date): Date {
+  // new Date(y, m+1, day, ...) silently overflows into the month after next
+  // when the target month is shorter than `day` (e.g. day=30 in a
+  // 28/29-day February rolls into March). Clamp to the target month's
+  // actual last day instead, so a billing day near month-end doesn't
+  // silently stretch the period by a few extra days.
+  const targetMonth = date.getMonth() + 1;
+  const daysInTargetMonth = new Date(date.getFullYear(), targetMonth + 1, 0).getDate();
+  const day = Math.min(date.getDate(), daysInTargetMonth);
+  return new Date(
+    date.getFullYear(), targetMonth, day,
+    date.getHours(), date.getMinutes(), date.getSeconds(), date.getMilliseconds(),
+  );
+}
+
+export function getFivePmDayStart(datetime: Date, gs: BillingClock): Date {
+  const d = new Date(
+    datetime.getFullYear(), datetime.getMonth(), datetime.getDate(),
+    gs.billingHour, gs.billingMinute, 0, 0,
+  );
+  if (datetime < d) d.setDate(d.getDate() - 1);
+  return d;
+}
+
+export function billingPeriodLengthDays(periodEnd: Date): number {
+  const start = new Date(
+    periodEnd.getFullYear(), periodEnd.getMonth() - 1, periodEnd.getDate(),
+    periodEnd.getHours(), periodEnd.getMinutes(), periodEnd.getSeconds(), periodEnd.getMilliseconds(),
+  );
+  const days = (periodEnd.getTime() - start.getTime()) / DAY_MS;
+  return days > 0 ? days : 30;
+}
+
+export function formatBillingMonth(date: Date): string {
+  return date.toLocaleDateString("en-GB", { month: "short", year: "numeric" });
+}
+
+export function formatDateTime(date: Date): string {
+  return date.toLocaleString("en-GB", {
+    day: "2-digit", month: "short", year: "numeric",
+    hour: "numeric", minute: "2-digit", hour12: true,
+  });
+}
+
+export function ymd(date: Date): string {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
+/**
+ * Equal elapsed-time weighting. Historical consumption is learned from
+ * actual reading intervals rather than a hard-coded daily usage curve.
+ */
+export function profileWeightBetween(start: Date, end: Date): number {
+  return end > start ? end.getTime() - start.getTime() : 0;
+}
+
+export function money(value: number | string | "" | null | undefined): string {
+  if (value === "" || value == null || Number.isNaN(Number(value))) return "—";
+  return `Rs ${Number(value).toLocaleString("en-PK", { maximumFractionDigits: 0 })}`;
+}
+
+export function units(value: number | string | "" | null | undefined, digits = 2): string {
+  if (value === "" || value == null || Number.isNaN(Number(value))) return "—";
+  return Number(value).toFixed(digits);
+}

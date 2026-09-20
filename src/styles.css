@@ -1,0 +1,139 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Fraunces", "Times New Roman", serif;
+  --font-sans: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+
+  --color-background: #0c0d0b;
+  --color-surface: #121410;
+  --color-elevated: #181a16;
+  --color-foreground: #ecebe4;
+  --color-muted: #9a9a90;
+  --color-subtle: #6f6f68;
+  --color-border: color-mix(in oklab, var(--color-foreground) 12%, transparent);
+  --color-primary: #ecebe4;
+  --color-primary-foreground: #0c0d0b;
+  --color-secondary: #23251f;
+  --color-secondary-foreground: #ecebe4;
+  --color-ring: #c8c4b8;
+  --color-meter1: #4FD1C5;
+  --color-meter2: #A78BFA;
+  --color-profile: #E3B341;
+  --color-danger: #8f4d45;
+  --color-danger-fg: #f4e8e4;
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-2xl: 28px;
+
+  --shadow-border: 0 0 0 1px color-mix(in oklab, var(--color-foreground) 10%, transparent);
+}
+
+:root {
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --motion-quick: 150ms;
+  --motion-fast: 250ms;
+  --motion-slow: 400ms;
+}
+
+@keyframes loading-flip {
+  from { transform: rotateY(0deg); }
+  to { transform: rotateY(360deg); }
+}
+
+.animate-loading-flip {
+  animation: loading-flip 1.1s linear infinite;
+  transform-style: preserve-3d;
+}
+
+:root[data-theme="light"] {
+  --color-background: #f7f8f6;
+  --color-surface: #ffffff;
+  --color-elevated: #ffffff;
+  --color-foreground: #17201b;
+  --color-muted: #66716a;
+  --color-subtle: #89928c;
+  --color-border: color-mix(in oklab, var(--color-foreground) 14%, transparent);
+  --color-primary: #17201b;
+  --color-primary-foreground: #ffffff;
+  --color-secondary: #e8ece9;
+  --color-secondary-foreground: #17201b;
+  --color-ring: #64746a;
+  --color-danger: #b74d43;
+  --color-danger-fg: #ffffff;
+}
+
+@media (prefers-color-scheme: light) {
+  :root[data-theme="system"] {
+    --color-background: #f7f8f6;
+    --color-surface: #ffffff;
+    --color-elevated: #ffffff;
+    --color-foreground: #17201b;
+    --color-muted: #66716a;
+    --color-subtle: #89928c;
+    --color-border: color-mix(in oklab, var(--color-foreground) 14%, transparent);
+    --color-primary: #17201b;
+    --color-primary-foreground: #ffffff;
+    --color-secondary: #e8ece9;
+    --color-secondary-foreground: #17201b;
+    --color-ring: #64746a;
+    --color-danger: #b74d43;
+    --color-danger-fg: #ffffff;
+  }
+}
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    color-scheme: dark;
+  }
+  html[data-theme="light"] {
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: light) {
+    html[data-theme="system"] {
+      color-scheme: light;
+    }
+  }
+  body {
+    background: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    line-height: 1.5;
+  }
+  h1, h2, h3 {
+    text-wrap: balance;
+    letter-spacing: -0.02em;
+  }
+  p {
+    text-wrap: pretty;
+  }
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+
+  table {
+    width: 100%;
+    min-width: 0;
+    table-layout: auto;
+  }
+  table.min-w-\[28rem\],
+  table.min-w-\[40rem\] {
+    min-width: 0 !important;
+  }
+  th, td {
+    min-width: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
